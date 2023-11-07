@@ -149,7 +149,7 @@ def get_wx_article(key="no_key"):
                 # cid 默认为0
                 article['cid'] = 0
                 # 封面图片先为空
-                article['image'] = ""
+                article['image'] = article['imgs'][0]
                 # 将link的名字修改为original_url
                 article['original_url'] = article.pop('link')
                 article_data.append(article)
