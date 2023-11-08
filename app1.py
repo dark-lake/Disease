@@ -138,7 +138,8 @@ def get_lenght(key="no_key"):
 def get_wx_article(key="no_key"):
     article_data = []
     try:
-        all_keys = get_all_keys()
+        # all_keys = get_all_keys()
+        all_keys = ['wechat_data11']
         for key in all_keys:
             if key.endswith("_length"):
                 continue
@@ -149,7 +150,7 @@ def get_wx_article(key="no_key"):
                 # cid 默认为0
                 article['cid'] = 0
                 # 封面图片先为空
-                article['image'] = article['imgs'][0]
+                article['image'] = article['cover']
                 # 将link的名字修改为original_url
                 article['original_url'] = article.pop('link')
                 article_data.append(article)
