@@ -16,5 +16,24 @@ def get_all_keys():
     print(keys)
     return keys
 
+def remove_cover():
+    keys = get_all_keys()
+    for key in keys:
+        print(key)
+        if key.endswith("_length"):
+            continue
+        data_length = chronic_redis2_conn.llen(key)
+        for i in range(0, data_length):
+            article = chronic_redis2_conn.lindex(key, i)
+            try:
+                article = json.loads(article)
+            except Exception as e:
+                print(i)
+                chronic_redis2_conn.lrem(key, i, json.dumps(article))
+                continue
+            article['cover'] = ""
+            chronic_redis2_conn.lset(key, i, json.dumps(article))
+            print(article)
+
 if __name__ == '__main__':
-    get_all_keys()
+    remove_cover()

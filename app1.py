@@ -3,12 +3,12 @@ import RedisConnectionPool as rcp
 import json
 from utils import get_all_keys
 from flask_cors import cross_origin
+
 # 获取redis连接
 # key为数据库的表名
 chronic_redis_conn = rcp.chronic_disease_redis
 chronic_redis2_conn = rcp.chronic_disease2_redis
 app = Flask(__name__)
-
 
 
 @app.route('/init_info', methods=["GET", "POST"])
@@ -50,7 +50,7 @@ def get_cate_data():
     """
     temp_redis_conn = chronic_redis_conn
     temp_redis2_conn = chronic_redis2_conn
-    #获取数据库2里面的值
+    # 获取数据库2里面的值
     redis2_keys = get_all_keys()
     try:
         if key:
@@ -73,10 +73,10 @@ def get_cate_data():
             print(result_data)
             return result_data
         else:
-            return {"data":[], "length": 0}
+            return {"data": [], "length": 0}
     except Exception as e:
         print(e)
-        return {"data":[], "length": 0}
+        return {"data": [], "length": 0}
 
 
 @app.route("/del", methods=['post'])
@@ -138,8 +138,7 @@ def get_lenght(key="no_key"):
 def get_wx_article(key="no_key"):
     article_data = []
     try:
-        # all_keys = get_all_keys()
-        all_keys = ['wechat_data11']
+        all_keys = get_all_keys()
         for key in all_keys:
             if key.endswith("_length"):
                 continue
@@ -147,12 +146,18 @@ def get_wx_article(key="no_key"):
             articles = chronic_redis2_conn.lrange(key, 0, -1)
             articles = [json.loads(i) for i in articles]
             for article in articles:
-                # cid 默认为0
-                article['cid'] = 0
-                # 封面图片先为空
-                article['image'] = article['cover']
-                # 将link的名字修改为original_url
-                article['original_url'] = article.pop('link')
+                try:
+                    if article['content'] is None:
+                        continue
+                    # cid 默认为0
+                    article['cid'] = 0
+                    # 封面图片先为空
+                    article['image'] = article.pop('cover')
+                    # 将link的名字修改为original_url
+                    article['original_url'] = article.pop('link')
+                    print(article)
+                except Exception as e:
+                    continue
                 article_data.append(article)
         data = {
             "code": 1,
@@ -160,8 +165,10 @@ def get_wx_article(key="no_key"):
             "msg": "请求成功",
             "data": article_data
         }
+        print(len(article_data))
         return data
     except Exception as e:
+        print(e)
         data = {
             "code": 0,
             "show": 1,
@@ -171,9 +178,6 @@ def get_wx_article(key="no_key"):
         return data
 
 
-
-
-
 if __name__ == '__main__':
-     # app.run(host="0.0.0.0", port=7777, debug=False)
+    # app.run(host="0.0.0.0", port=7777, debug=False)
     app.run(host="0.0.0.0", port=5000, debug=True)
